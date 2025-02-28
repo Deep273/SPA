@@ -1,14 +1,37 @@
-import { createStore } from 'vuex'
+import { createStore } from 'vuex';
+import { loginRequest } from '@/utils/api.js';
 
 export default createStore({
   state: {
+    token: localStorage.getItem('myAppToken') || '',
   },
   getters: {
+    isAuthenticated: (state) => !!state.token,
   },
   mutations: {
+    AUTH_SUCCESS: (state, token) => {
+      state.token = token;
+    },
+    AUTH_ERROR: (state) => {
+      state.token = '';
+    },
   },
+  // Пример действия в store
   actions: {
-  },
-  modules: {
+    AUTH_REQUEST: ({ commit }, user) => {
+      return new Promise((resolve, reject) => {
+        loginRequest(user)
+            .then((token) => {
+              commit('AUTH_SUCCESS', token);
+              localStorage.setItem('myAppToken', token);
+              resolve();
+            })
+            .catch((error) => {
+              commit('AUTH_ERROR');
+              localStorage.removeItem('myAppToken');
+              reject(error); // Передаем ошибку при отклонении промиса
+            });
+      });
+    },
   }
 })
