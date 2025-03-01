@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>Welcome to the Home Page!</h1>
+    <h1>Welcome to the Home Page, {{}}</h1>
     <p>This is the main page of the app.</p>
   </div>
 </template>

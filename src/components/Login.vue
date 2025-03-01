@@ -19,18 +19,33 @@ export default {
   methods: {
     login() {
       const user = {
-        username: this.username,
+        email: this.username,  // здесь предполагается, что username это email
         password: this.password,
       };
 
-      // Ожидаем результата от dispatch и обрабатываем ошибку
-      this.$store.dispatch('AUTH_REQUEST', user)
-          .then(() => {
-            this.$router.push('/'); // Перенаправляем на главную страницу после успешного входа
+      // Отправляем запрос на сервер
+      fetch('http://localhost:3000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user),
+      })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error('Login failed: ' + response.statusText);
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log('Login successful', data);
+            // Сохраняем токен или другую информацию, если нужно
+            localStorage.setItem('user_token', data.user_token);
+            this.$router.push('/');  // Перенаправляем на главную страницу
           })
           .catch((error) => {
-            console.error("Login failed:", error);  // Логируем ошибку
-            alert('Login failed: ' + error.message); // Показываем ошибку пользователю
+            console.error('Login failed:', error);
+            alert('Login failed: ' + error.message);  // Показываем ошибку пользователю
           });
     },
   },
